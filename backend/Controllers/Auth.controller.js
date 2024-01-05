@@ -1,7 +1,8 @@
 const User = require('../Models/User.model.js');
 const bcrypt = require('bcrypt');
+const errorHandler = require('../Utils/Error.js');
 
-const signup = async (req,res) =>{
+const signup = async (req,res,next) =>{
     try {
         const salt = await bcrypt.genSalt(10);
         let secPassword = await bcrypt.hash(req.body.password,salt);
@@ -13,8 +14,7 @@ const signup = async (req,res) =>{
         })
         res.json({success:true});
     } catch (error) {
-        console.log(error)
-        res.json({success:false});
+        next(error);
     }
 }
 
