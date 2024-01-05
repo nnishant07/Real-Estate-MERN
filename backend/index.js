@@ -18,11 +18,12 @@ async function main() {
     console.error('Error connecting to MongoDB:', error);
   }
 }
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-  })
+
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  })
+  console.log(`Example app listening on port ${port}`)
+})
+
+app.use(express.json())
+app.use('/api',require("./Routes/Auth.route"));
   
