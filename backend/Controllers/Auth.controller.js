@@ -37,7 +37,7 @@ const signin = async (req,res,next) =>{
         
         const {password: pass,...rest} = userData._doc;
         const authToken = jwt.sign({id: userData._id},jwtSecret);
-        res.cookie('authToken',authToken,{httpOnly: true}).status(200).json({success:true,rest})
+        res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json({success:true,rest})
         //res.json({success:true,authToken:authToken});
 
     } catch (error) {

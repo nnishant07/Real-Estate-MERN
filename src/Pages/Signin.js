@@ -76,7 +76,7 @@ const Signin = () => {
             </Form>
 
             <p className="text-center mb-0">
-              Don't Have an Account? <Link to="/signup" style={{ color: 'blue' }}>Sign Up</Link>
+              Dont Have an Account? <Link to="/signup" style={{ color: 'blue' }}>Sign Up</Link>
             </p>
           </Card.Body>
         </Card>
