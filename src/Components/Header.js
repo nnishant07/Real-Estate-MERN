@@ -12,13 +12,13 @@ function Header() {
 
   const brandLinkStyle = {
     fontSize: '24px',
-    marginLeft: '20px',
+    marginLeft: '15px',
     fontWeight: 'bold',
   };
 
   const headerNavbarStyle = {
     height: '70px',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: 'rgb(226 ,232 ,240)',
   };
 
   const navLinkStyle = {

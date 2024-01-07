@@ -1,6 +1,5 @@
 const User = require('../Models/User.model.js');
 const bcrypt = require('bcrypt');
-const errorHandler = require('../Utils/Error.js');
 
 const signup = async (req,res,next) =>{
     try {
