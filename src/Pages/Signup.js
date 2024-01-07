@@ -8,7 +8,6 @@ const Signup = () => {
     name: "",
     email: "",
     password: "",
-    location: ""
   });
   const [error,setError]= useState(null);
   const [loading,setLoading] = useState(false);
@@ -86,7 +85,24 @@ const Signup = () => {
           </Card.Body>
         </Card>
       </Container>
-      {error && <p className='text-red-500 mt-5'>{error}</p>}
+      {error && (
+      <p
+        className='text-red-500'
+        style={{
+          position: 'absolute',
+          bottom: '0',
+          left: '0',
+          width: '100%',
+          textAlign: 'center',
+          backgroundColor: '#f8d7da',
+          padding: '10px',
+          color: 'red',
+          margin: '0',
+        }}
+      >
+        {error}
+      </p>
+    )}
     </div>
   )
 }
