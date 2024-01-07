@@ -45,4 +45,35 @@ const signin = async (req,res,next) =>{
     }
 }
 
-module.exports = {signup,signin};
+const google = async (req,res,next)=>{
+    try{
+        const userData= await User.findOne({email: req.body.email})
+
+        if(userData){
+            const {password: pass,...rest} = userData._doc;
+            const authToken = jwt.sign({id: userData._id},jwtSecret);
+            res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json(rest)
+        }
+        else{
+            const generatedPassword = Math.random().toString(36).slice(-8)+Math.random().toString(36).slice(-8);
+            const salt = await bcrypt.genSalt(10);
+            let secPassword = await bcrypt.hash(generatedPassword,salt);
+
+            const newUser= await User({
+                name: req.body.name,
+                password: secPassword,
+                email: req.body.email,
+                avatar: req.body.photo
+            })
+            await newUser.save();
+
+            const authToken = jwt.sign({id: newUser._id},jwtSecret);
+            const {password: pass,...rest} = newUser._doc;
+            res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json(rest)
+        }
+    }
+    catch(error){
+        next(error)
+    }
+}
+module.exports = {signup,signin,google};

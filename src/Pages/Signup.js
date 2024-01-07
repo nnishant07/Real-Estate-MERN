@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Card, Form, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
+import OAuth from '../Components/OAuth';
 
 const Signup = () => {
   const [info, setInfo] = useState({  
@@ -75,8 +76,9 @@ const Signup = () => {
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? 'Loading...' : 'Sign Up'}
+                {loading ? 'LOADING...' : 'SIGN UP'}
               </Button>
+              <OAuth/>
             </Form>
 
             <p className="text-center mb-0">

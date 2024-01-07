@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../Components/Header';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart,signInFailure,signInSuccess} from '../Redux/user/UserSlice';
+import OAuth from '../Components/OAuth';
 
 const Signin = () => {
   const [info, setInfo] = useState({  
@@ -71,8 +72,9 @@ const Signin = () => {
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? 'Loading...' : 'Sign In'}
+                {loading ? 'Loading...' : 'SIGN IN'}
               </Button>
+              <OAuth/>
             </Form>
 
             <p className="text-center mb-0">
