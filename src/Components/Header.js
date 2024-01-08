@@ -2,8 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Form, Nav, Navbar, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { useMediaQuery } from 'react-responsive';
 
 function Header() {
+  const isSmallScreen = useMediaQuery({ maxWidth: 991 });
   const searchContainerStyle = {
     display: 'flex',
     justifyContent: 'center',
@@ -31,13 +34,16 @@ function Header() {
     transition: 'color 0.3s', // Add transition for smooth effect
   };
 
-  const handleSearchIconHover = (event) => {
-    event.target.style.color = 'black'; // Change color to black on hover
+  const profileImageStyle = {
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    marginLeft: '10px',
+    display: isSmallScreen ? 'none' : 'inline-block',
   };
 
-  const handleSearchIconLeave = (event) => {
-    event.target.style.color = ''; // Revert color to default when mouse leaves
-  };
+  const { currentUser } = useSelector((state) => state.user);
 
   return (
     <Navbar expand="lg" style={headerNavbarStyle}>
@@ -53,8 +59,6 @@ function Header() {
               variant="outline-secondary"
               className="bg-white border rounded-pill"
               style={searchButtonStyle}
-              onMouseEnter={handleSearchIconHover}
-              onMouseLeave={handleSearchIconLeave}
             >
               <FaSearch />
             </Button>
@@ -69,9 +73,19 @@ function Header() {
             <Nav.Link as={Link} to="/about" style={navLinkStyle}>
               About
             </Nav.Link>
-            <Nav.Link as={Link} to="/signin" style={navLinkStyle}>
-              SignIn
-            </Nav.Link>
+            {isSmallScreen ? (
+              <Nav.Link as={Link} to="/profile" style={navLinkStyle}>
+                Profile
+              </Nav.Link>
+            ) : (
+              <Nav.Link as={Link} to="/profile" style={navLinkStyle}>
+                {currentUser ? (
+                  <img src={currentUser.avatar} alt="User Image" style={profileImageStyle} />
+                ) : (
+                  'SignIn'
+                )}
+              </Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

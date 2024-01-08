@@ -9,17 +9,21 @@ import Signin from './Pages/Signin';
 import About from './Pages/About';
 import Profile from './Pages/Profile';
 import Signup from './Pages/Signup';
+import PrivateRoute from './Components/PrivateRoute';
 
 const App = () => {
   return (
     <Router>
         <div>
           <Routes> 
-            <Route exact path='/' element={<Home/>}/>
-            <Route exact path='/signin' element={<Signin/>}/>
-            <Route exact path='/signup' element={<Signup/>}/>
-            <Route exact path='/about' element={<About/>}/>
-            <Route exact path='/profile' element={<Profile/>}/>
+            <Route path='/' element={<Home/>}/>
+            <Route path='/signin' element={<Signin/>}/>
+            <Route path='/signup'  element={<Signup/>}/>
+            <Route path='/about' element={<About/>}/>
+            <Route element={<PrivateRoute/>}>
+              <Route path='/profile' element={<Profile/>}/>
+            </Route>
+            
           </Routes>
         </div>
       </Router>
