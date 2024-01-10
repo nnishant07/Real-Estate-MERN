@@ -1,19 +1,12 @@
 const express = require('express')
 const mongoose = require('mongoose');
 const dotenv=require('dotenv');
-
+const cookieParser = require('cookie-parser');
 dotenv.config();
 const app = express()
 const port = 5000;
 
-app.use((req,res,next)=>{
-  res.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-})
+
 
 main().catch(err => console.error(err));
 
@@ -34,8 +27,10 @@ app.listen(port, () => {
 })
 
 app.use(express.json())
+app.use(cookieParser())
+
 app.use('/api',require("./Routes/Auth.route"));
-  
+app.use('/api',require("./Routes/User.Route"));  
 
 app.use((err,req,res,next)=>{
   const statusCode=err.statusCode || 500;

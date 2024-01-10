@@ -37,9 +37,10 @@ const signin = async (req,res,next) =>{
         
         const {password: pass,...rest} = userData._doc;
         const authToken = jwt.sign({id: userData._id},jwtSecret);
-        res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json(rest)
+        res.cookie('authToken',authToken,{httpOnly: true}).status(200).json(rest)
         //res.json({success:true,authToken:authToken});
-
+        //console.log('Cookies Set:', res.getHeaders()['set-cookie']);
+        
     } catch (error) {
         next(error);
     }
@@ -52,7 +53,7 @@ const google = async (req,res,next)=>{
         if(userData){
             const {password: pass,...rest} = userData._doc;
             const authToken = jwt.sign({id: userData._id},jwtSecret);
-            res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json(rest)
+            res.cookie('authToken',authToken,{httpOnly: true}).status(200).json(rest)
         }
         else{
             const generatedPassword = Math.random().toString(36).slice(-8)+Math.random().toString(36).slice(-8);
@@ -69,7 +70,7 @@ const google = async (req,res,next)=>{
 
             const authToken = jwt.sign({id: newUser._id},jwtSecret);
             const {password: pass,...rest} = newUser._doc;
-            res.cookie('authToken',authToken,{httpOnly: true,secure:true,sameSite: 'None',Expires: 'Session'}).status(200).json(rest)
+            res.cookie('authToken',authToken,{httpOnly: true}).status(200).json(rest)
         }
     }
     catch(error){
