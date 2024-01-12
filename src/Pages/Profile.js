@@ -5,7 +5,7 @@ import Header from '../Components/Header';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../GoogleFirebase';
-import { updateUserFailure, updateUserStart, updateUserSuccess } from '../Redux/user/UserSlice';
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from '../Redux/user/UserSlice';
 
 const Profile = () => {
   const { currentUser,loading,error } = useSelector((state) => state.user);
@@ -85,6 +85,27 @@ const Profile = () => {
       dispatch(updateUserFailure(error.message));
     }
   }
+
+  const handleDelete =async (e)=>{
+    e.preventDefault();
+    try{
+      dispatch(deleteUserStart());
+    
+      const res= await fetch(`/api/delete/${currentUser._id}`,{
+        method: "DELETE",
+      })
+
+      const data= await res.json();
+      console.log(data);
+      if (data.success === false){
+        dispatch(deleteUserFailure(data.message));
+      } else {
+        dispatch(deleteUserSuccess());
+      }
+    }catch(error){
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
   return (
     <div>
       <Header />
@@ -144,7 +165,7 @@ const Profile = () => {
                 {loading ? 'LOADING...': 'UPDATE'}
               </Button>
               <div className="w-100 d-flex justify-content-between">
-                <Link to="#" style={{ color: 'red', textDecoration: 'None' }}>Delete Account</Link>
+                <Link onClick={handleDelete} style={{ color: 'red', textDecoration: 'None' }}>Delete Account</Link>
                 <Link to="/signin" style={{ color: 'red', textDecoration: 'None' }}>Sign Out</Link>
               </div>
             </Form>
