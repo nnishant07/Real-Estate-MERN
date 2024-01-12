@@ -31,6 +31,7 @@ app.use(cookieParser())
 
 app.use('/api',require("./Routes/Auth.route"));
 app.use('/api',require("./Routes/User.Route"));  
+app.use('/api',require("./Routes/Listing.route"));  
 
 app.use((err,req,res,next)=>{
   const statusCode=err.statusCode || 500;
