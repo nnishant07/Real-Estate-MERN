@@ -182,6 +182,7 @@ const Profile = () => {
                   padding: '10px',
                   color: 'red',
                   margin: '0',
+                  zIndex: 1000,
         }}
       >
         {error}
