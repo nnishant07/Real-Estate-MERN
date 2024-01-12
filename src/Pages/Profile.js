@@ -2,17 +2,28 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Container, Card, Form, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Header from '../Components/Header';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../GoogleFirebase';
+import { updateUserFailure, updateUserStart, updateUserSuccess } from '../Redux/user/UserSlice';
 
 const Profile = () => {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser,loading,error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [updateSuccess,setUpdateSuccess]=useState(false);
+
+  const [info, setInfo] = useState({  
+    email: currentUser.email,
+    name: currentUser.name,
+    password: currentUser.password,
+    avatar: currentUser.avatar,
+
+  });
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (file) {
@@ -41,12 +52,39 @@ const Profile = () => {
       () => {
         setFileUploadError(false); // Reset error state when upload is successful
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setFormData({ ...formData, avatar: downloadURL });
+          setInfo({ ...info, avatar: downloadURL });
         });
       }
     );
   };
+  const handleChange = (e)=>{
+    setInfo({ ...info, [e.target.name]: e.target.value });
+  }
+  const handleSubmit =async (e)=>{
+    e.preventDefault();
+    try{
+      dispatch(updateUserStart());
+    
+      const res= await fetch(`/api/update/${currentUser._id}`,{
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({...info})
+      })
 
+      const data= await res.json();
+      console.log(data);
+      if (data.success === false){
+        dispatch(updateUserFailure(data.message));
+      } else {
+        dispatch(updateUserSuccess(data));
+        setUpdateSuccess(true);
+      }
+    }catch(error){
+      dispatch(updateUserFailure(error.message));
+    }
+  }
   return (
     <div>
       <Header />
@@ -64,7 +102,7 @@ const Profile = () => {
                   onClick={() => {
                     fileRef.current.click();
                   }}
-                  src={formData.avatar || currentUser.avatar}
+                  src={info.avatar}
                   alt="Profile"
                   style={{
                     width: '120px',
@@ -84,13 +122,13 @@ const Profile = () => {
                 </p>
               </div>
               <Form.Group className='mb-4'>
-                <Form.Control type='text' placeholder='Your Name' size='lg' />
+                <Form.Control type='text' placeholder='Your Name' size='lg' name='name' value={info.name}  onChange={handleChange}/>
               </Form.Group>
               <Form.Group className='mb-4'>
-                <Form.Control type='email' placeholder='Your Email' size='lg' />
+                <Form.Control type='email' placeholder='Your Email' size='lg' name='email'  value={info.email}  onChange={handleChange}/>
               </Form.Group>
               <Form.Group className='mb-4'>
-                <Form.Control type='password' placeholder='Password' size='lg' />
+                <Form.Control type='password' placeholder='Password' size='lg' name='password' value={info.password} onChange={handleChange}/>
               </Form.Group>
               <Button
                 className='mb-4 w-100'
@@ -100,8 +138,10 @@ const Profile = () => {
                   color: 'white',
                   borderColor: 'rgb(51,65,85)',
                 }}
+                onClick={handleSubmit}
+                disabled={loading}
               >
-                UPDATE
+                {loading ? 'LOADING...': 'UPDATE'}
               </Button>
               <div className="w-100 d-flex justify-content-between">
                 <Link to="#" style={{ color: 'red', textDecoration: 'None' }}>Delete Account</Link>
@@ -111,6 +151,61 @@ const Profile = () => {
           </Card.Body>
         </Card>
       </Container>
+      {error && (
+      <p
+        className='text-red-500'
+        style={{
+          position: 'fixed',
+                  bottom: '0',
+                  left: '0',
+                  width: '100%',
+                  textAlign: 'center',
+                  backgroundColor: '#f8d7da',
+                  padding: '10px',
+                  color: 'red',
+                  margin: '0',
+        }}
+      >
+        {error}
+      </p>
+    )}
+    {error && (
+      <p
+        className='text-red-500'
+        style={{
+          position: 'fixed',
+                  bottom: '0',
+                  left: '0',
+                  width: '100%',
+                  textAlign: 'center',
+                  backgroundColor: '#f8d7da',
+                  padding: '10px',
+                  color: 'red',
+                  margin: '0',
+        }}
+      >
+        {error}
+      </p>
+    )}
+
+{updateSuccess && (
+      <p
+        className='text-green-500'
+        style={{
+          position: 'fixed',
+                  bottom: '0',
+                  left: '0',
+                  width: '100%',
+                  textAlign: 'center',
+                  backgroundColor: '#8FDB81',
+                  padding: '10px',
+                  color: 'white',
+                  margin: '0',
+        }}
+      >
+        User Updated Successfully!!!
+      </p>
+    )}
     </div>
   )
 }

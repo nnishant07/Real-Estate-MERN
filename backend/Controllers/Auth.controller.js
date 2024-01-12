@@ -61,7 +61,8 @@ const google = async (req,res,next)=>{
             let secPassword = await bcrypt.hash(generatedPassword,salt);
 
             const newUser= await User({
-                name: req.body.name,
+                name: req.body.name.split(' ').join('').toLowerCase() +
+                Math.random().toString(36).slice(-4),
                 password: secPassword,
                 email: req.body.email,
                 avatar: req.body.photo
