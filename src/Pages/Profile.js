@@ -129,7 +129,7 @@ const Profile = () => {
       <Header />
       <Container fluid className='d-flex align-items-center justify-content-center'>
         <div className='mask gradient-custom-3'></div>
-        <Card className='m-5' style={{ maxWidth: '600px', border: 'none' }}>
+        <Card className='m-5' style={{ maxWidth: '600px', border: 'none', }}>
           <Card.Body className='px-5'>
             <h2 className="text-uppercase text-center mb-5">profile</h2>
             <Form style={{ width: '100%' }}>
@@ -175,13 +175,28 @@ const Profile = () => {
                 style={{
                   backgroundColor: 'rgb(51,65,85)',
                   color: 'white',
-                  borderColor: 'rgb(51,65,85)',
                 }}
                 onClick={handleSubmit}
                 disabled={loading}
               >
                 {loading ? 'LOADING...': 'UPDATE'}
               </Button>
+              <Link to="/create-listing" style={{ textDecoration: 'none' }}>
+                <button
+                  className='mb-4 w-100 btn btn-lg'
+                  style={{
+                    backgroundColor: '#6ABE5D',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    cursor: 'pointer',
+                  }}
+                  disabled={loading}
+                >
+                  CREATE LISTING
+                </button>
+              </Link>
               <div className="w-100 d-flex justify-content-between">
                 <Link onClick={handleDelete} style={{ color: 'red', textDecoration: 'None' }}>Delete Account</Link>
                 <Link onClick={handleSignOut} style={{ color: 'red', textDecoration: 'None' }}>Sign Out</Link>
@@ -190,24 +205,6 @@ const Profile = () => {
           </Card.Body>
         </Card>
       </Container>
-      {error && (
-      <p
-        className='text-red-500'
-        style={{
-          position: 'fixed',
-                  bottom: '0',
-                  left: '0',
-                  width: '100%',
-                  textAlign: 'center',
-                  backgroundColor: '#f8d7da',
-                  padding: '10px',
-                  color: 'red',
-                  margin: '0',
-        }}
-      >
-        {error}
-      </p>
-    )}
     {error && (
       <p
         className='text-red-500'
