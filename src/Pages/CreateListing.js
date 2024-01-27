@@ -3,13 +3,32 @@ import { Container, Row, Col, Card, Form, InputGroup } from 'react-bootstrap';
 import Header from '../Components/Header';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { app } from '../GoogleFirebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const CreateListing = () => {
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentUser} = useSelector((state) => state.user);
   const [files,setFiles]=useState([]);
   const [filePerc, setFilePerc] = useState(0);
+  const [error,setError]= useState(false);
+  const [loading,setLoading]= useState(false);
+
   const [formData,setFormData] = useState({
     imageUrls: [],
+    name: '',
+    description: '',
+    address: '',
+    type: 'rent',
+    bedrooms: 1,
+    bathrooms: 1,
+    regularPrice: 50,
+    discountPrice: 0,
+    offer: false,
+    parking: false,
+    furnished: false,
   });
   const [imageUploadError, setImageUploadError] = useState(false);
   console.log(formData);
@@ -69,6 +88,65 @@ const CreateListing = () => {
       imageUrls: formData.imageUrls.filter((_,i)=> i!==index),
     });
   }
+
+  const handleChange = (e) =>{
+    if(e.target.id === 'sell' || e.target.id === 'rent'){
+      setFormData({
+        ...formData,
+        type: e.target.id
+      })
+    }
+
+    if(e.target.id === 'parking' || e.target.id === 'furnished' || e.target.id === 'offer'){
+      setFormData({
+        ...formData,
+        [e.target.id]: e.target.checked 
+      })
+    }
+
+    if(e.target.type === 'number' || e.target.type === 'text' || e.target.type==='textarea'){
+      setFormData({
+        ...formData,
+        [e.target.id]: e.target.value
+      })
+    }
+  }
+
+  const handleSubmit = async (e)=>{
+    e.preventDefault();
+    try{
+      if(formData.imageUrls.length <1 ){
+        return setError('Upload at least one image');
+      }
+      if(+formData.regularPrice<+formData.discountPrice){
+        return setError('Discount price must be lesser or equal to regularPrice')
+      }
+      setLoading(true);
+      setError(false);
+
+      const response = await fetch("/api/create", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...formData, userRef: currentUser._id })
+      });
+      const json = await response.json();
+
+      setLoading(false);
+
+      if (json.success === false){
+       setError(json.message);
+      } else {
+        navigate(`/listing/${json._id}`)
+        console.log(json);
+      }
+
+    }catch(error){
+      setError(error.message);
+
+    }
+  }
   return (
     <div>
       <Header />
@@ -86,62 +164,72 @@ const CreateListing = () => {
                 <Card.Body className='px-5'>
                   <Form style={{ width: '100%' }}>
                     <Form.Group className='mb-4'>
-                      <Form.Control type='text' placeholder='Name' size='lg' />
+                      <Form.Control type='text' placeholder='Name' size='lg' id='name' onChange={handleChange} value={formData.name} />
                     </Form.Group>
                     <InputGroup className='mb-4'>
-                      <Form.Control as="textarea" aria-label="With textarea" placeholder='Description' size='lg' />
+                      <Form.Control as="textarea" aria-label="With textarea" placeholder='Description' size='lg'  id='description' onChange={handleChange} value={formData.description}/>
                     </InputGroup>
                     <Form.Group className='mb-4'>
-                      <Form.Control type='text' placeholder='Address' size='lg' />
+                      <Form.Control type='text' placeholder='Address' size='lg' onChange={handleChange} id='address' value={formData.address}/>
                     </Form.Group>
                     {['checkbox'].map((type) => (
                       <div key={`inline-${type}`} className="mb-4">
                         <Form.Check
                           inline
                           label="Sell"
-                          name="group1"
+                          id='sell'
                           type={type}
                           style={{ fontSize: '20px' }}
+                          onChange={handleChange} 
+                          checked={formData.type==='sell'}
                         />
                         <Form.Check
                           inline
                           label="Rent"
-                          name="group1"
+                          id='rent'
                           type={type}
                           style={{ fontSize: '20px' }}
+                          onChange={handleChange} 
+                          checked={formData.type==='rent'}
                         />
                         <Form.Check
                           inline
                           label="Parking Spot"
-                          name="group1"
+                          id='parking'
                           type={type}
                           style={{ fontSize: '20px' }}
+                          onChange={handleChange} 
+                          checked={formData.parking}
                         />
                         <Form.Check
                           inline
                           label="Furnished"
-                          name="group1"
+                          id='furnished'
                           type={type}
                           style={{ fontSize: '20px' }}
+                          onChange={handleChange} 
+                          checked={formData.furnished}
                         />
                         <Form.Check
                           inline
                           label="Offer"
-                          name="group1"
+                          id='offer'
                           type={type}
                           style={{ fontSize: '20px' }}
+                          onChange={handleChange} 
+                          checked={formData.offer}
                         />
                       </div>
                     ))}
                     <Form.Group className='mb-4 d-flex align-items-center'>
                         <div style={{ width: '25%', marginRight: '10px' }}>
-                            <Form.Control type='number' size='lg' defaultValue={1} style={{ width: '100%' }} />
+                            <Form.Control type='number' size='lg' style={{ width: '100%' }} id='bedrooms' onChange={handleChange} value={formData.bedrooms} />
                         </div>
                         <div style={{ marginRight: '15px' }}>
                             <Form.Label style={{ fontSize: '20px',  }}>Beds</Form.Label>
                         </div>
                         <div style={{ width: '25%', marginRight: '10px' }}>
-                            <Form.Control type='number' size='lg' defaultValue={1} style={{ width: '100%' }} />
+                            <Form.Control type='number' size='lg' style={{ width: '100%' }} id='bathrooms' onChange={handleChange} value={formData.bathrooms}/>
                         </div>
                         <div style={{ marginRight: '15px' }}>
                             <Form.Label style={{ fontSize: '20px',  }}>Baths</Form.Label>
@@ -150,7 +238,7 @@ const CreateListing = () => {
 
                     <Form.Group className='mb-4 d-flex align-items-center'>
                         <div style={{ width: '35%', marginRight: '10px' }}>
-                            <Form.Control type='number' size='lg' defaultValue={1} style={{ width: '100%' }} />
+                            <Form.Control type='number' size='lg' style={{ width: '100%' }} min={50} max={10000000} id='regularPrice' onChange={handleChange} value={formData.regularPrice}/>
                         </div>
                         <div style={{ marginRight: '15px' }}>
                             <Form.Label >{
@@ -161,19 +249,21 @@ const CreateListing = () => {
                                 </div>}</Form.Label>
                         </div>
                         </Form.Group>
-                        <Form.Group className='mb-4 d-flex align-items-center'>
-                        <div style={{ width: '35%', marginRight: '10px' }}>
-                            <Form.Control type='number' size='lg' defaultValue={1} style={{ width: '100%' }} />
-                        </div>
-                        <div style={{ marginRight: '15px' }}>
-                            <Form.Label >{
-                                <div>
-                                <span style={{ display: 'block',fontSize: '20px', }}>Discounted price</span>
-                                <span style={{ display: 'block',fontSize: '15px' }}>($ / Month)</span>
-
-                                </div>}</Form.Label>
-                        </div>
-                        </Form.Group>
+                        {formData.offer && (
+                          <Form.Group className='mb-4 d-flex align-items-center'>
+                          <div style={{ width: '35%', marginRight: '10px' }}>
+                              <Form.Control type='number' size='lg' style={{ width: '100%' }} min={0} max={10000000} id='discountPrice' onChange={handleChange} value={formData.discountPrice}/>
+                          </div>
+                          <div style={{ marginRight: '15px' }}>
+                              <Form.Label >{
+                                  <div>
+                                  <span style={{ display: 'block',fontSize: '20px', }}>Discounted price</span>
+                                  <span style={{ display: 'block',fontSize: '15px' }}>($ / Month)</span>
+  
+                                  </div>}</Form.Label>
+                          </div>
+                          </Form.Group>
+                        )}  
                   </Form>
                 </Card.Body>
               </Card>
@@ -224,6 +314,7 @@ const CreateListing = () => {
                     ))}
                     <button
                       className='w-100 btn btn-lg mt-4 ml-0 mb-4 mr-4'
+                      disabled ={loading}
                       style={{
                         backgroundColor: '#6ABE5D',
                         color: 'white',
@@ -232,8 +323,10 @@ const CreateListing = () => {
                         padding: '10px',
                         cursor: 'pointer',
                       }}
+                      onClick={handleSubmit}
                     >
-                      CREATE LISTING
+                      {loading ? 'CREATING...' : 'CREATE LISTING'}
+                      
                     </button>
                   </Form>
                 </Card.Body>
@@ -258,6 +351,26 @@ const CreateListing = () => {
         }}
       >
         {imageUploadError}
+      </p>
+    )}
+
+{error && (
+      <p
+        className='text-red-500'
+        style={{
+          position: 'fixed',
+          bottom: '0',
+          left: '0',
+          width: '100%',
+          textAlign: 'center',
+          backgroundColor: '#f8d7da',
+          padding: '10px',
+          color: 'red',
+          margin: '0',
+          zIndex: 1000,
+        }}
+      >
+        {error}
       </p>
     )}
     </div>
