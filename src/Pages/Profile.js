@@ -14,6 +14,8 @@ const Profile = () => {
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [updateSuccess,setUpdateSuccess]=useState(false);
+  const [showListingsError,setShowListingsError] = useState(false);
+  const [UserListings,setUserListings]=useState([]);
 
   const [info, setInfo] = useState({  
     email: currentUser.email,
@@ -124,6 +126,28 @@ const Profile = () => {
       dispatch(signOutUserFailure(error.message));
     }
   }
+
+  const handleShowListing = async () =>{
+    try{
+      setShowListingsError(false);
+      const res=await fetch(`/api/listing/${currentUser._id}`);
+      
+      const data=await res.json();
+
+      if(data.success === false){
+        setShowListingsError(true);
+        return;
+      }
+      else{
+        
+        setUserListings(data);
+        //console.log(data);
+        console.log(UserListings);
+      }
+    }catch(error){
+      setShowListingsError('Error is getting user listing');
+    }
+  }
   return (
     <div>
       <Header />
@@ -197,14 +221,56 @@ const Profile = () => {
                   CREATE LISTING
                 </button>
               </Link>
-              <div className="w-100 d-flex justify-content-between">
+              <div className="w-100 mb-4 d-flex justify-content-between">
                 <Link onClick={handleDelete} style={{ color: 'red', textDecoration: 'None' }}>Delete Account</Link>
                 <Link onClick={handleSignOut} style={{ color: 'red', textDecoration: 'None' }}>Sign Out</Link>
               </div>
             </Form>
+
+            <div className="w-100 d-flex justify-content-center">
+                <Link onClick={handleShowListing} style={{ color: 'green', textDecoration: 'None' }}>Show Listings</Link>
+              </div>
           </Card.Body>
+          {UserListings && UserListings.length > 0 && 
+  UserListings.map((listing) => (
+    <div key={listing._id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginBottom: '10px' }}>
+      <Link to={`/listing/${listing._id}`} style={{ textDecoration: 'none' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <img
+            src={listing.imageUrls[0]}
+            alt='listing image'
+            style={{ width: '100px', height: '100px', marginRight: '10px' }}
+          />
+          <p style={{ color: 'black', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: '600', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{listing.name}</p>
+          <div >
+  <button 
+    className="btn btn-danger btn-sm"
+    style={{ padding: '5px', display: 'block', marginBottom: '5px', width: '70px', height: '30px' }} // Added width and height
+  >
+    DELETE
+  </button>
+  <button
+    className="btn btn-success btn-sm"
+    style={{ padding: '5px', display: 'block', width: '70px', height: '30px' }} // Added width and height
+  >
+    EDIT
+  </button>
+</div>
+
+          
+          
+        </div>
+      </Link>
+    </div>
+  ))
+}
+
         </Card>
+        
       </Container>
+
+      
+
     {error && (
       <p
         className='text-red-500'
@@ -224,7 +290,25 @@ const Profile = () => {
         {error}
       </p>
     )}
-
+    {showListingsError && (
+      <p
+        className='text-red-500'
+        style={{
+          position: 'fixed',
+                  bottom: '0',
+                  left: '0',
+                  width: '100%',
+                  textAlign: 'center',
+                  backgroundColor: '#f8d7da',
+                  padding: '10px',
+                  color: 'red',
+                  margin: '0',
+                  zIndex: 1001,
+        }}
+      >
+        {showListingsError}
+      </p>
+    )}
 {updateSuccess && (
       <p
         className='text-green-500'
