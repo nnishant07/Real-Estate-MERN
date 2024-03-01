@@ -8,16 +8,16 @@ import { app } from '../GoogleFirebase';
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, signOutUserFailure, signOutUserStart, signOutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from '../Redux/user/UserSlice';
 
 const Profile = () => {
-  const { currentUser,loading,error } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
-  const [updateSuccess,setUpdateSuccess]=useState(false);
-  const [showListingsError,setShowListingsError] = useState(false);
-  const [UserListings,setUserListings]=useState([]);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [UserListings, setUserListings] = useState([]);
 
-  const [info, setInfo] = useState({  
+  const [info, setInfo] = useState({
     email: currentUser.email,
     name: currentUser.name,
     password: currentUser.password,
@@ -59,94 +59,114 @@ const Profile = () => {
       }
     );
   };
-  const handleChange = (e)=>{
+  const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
   }
-  const handleSubmit =async (e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+    try {
       dispatch(updateUserStart());
-    
-      const res= await fetch(`/api/update/${currentUser._id}`,{
+
+      const res = await fetch(`/api/update/${currentUser._id}`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({...info})
+        body: JSON.stringify({ ...info })
       })
 
-      const data= await res.json();
+      const data = await res.json();
       console.log(data);
-      if (data.success === false){
+      if (data.success === false) {
         dispatch(updateUserFailure(data.message));
       } else {
         dispatch(updateUserSuccess(data));
         setUpdateSuccess(true);
       }
-    }catch(error){
+    } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
   }
 
-  const handleDelete =async (e)=>{
+  const handleDelete = async (e) => {
     e.preventDefault();
-    try{
+    try {
       dispatch(deleteUserStart());
-    
-      const res= await fetch(`/api/delete/${currentUser._id}`,{
+
+      const res = await fetch(`/api/delete/${currentUser._id}`, {
         method: "DELETE",
       })
 
-      const data= await res.json();
+      const data = await res.json();
       console.log(data);
-      if (data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
       } else {
         dispatch(deleteUserSuccess());
       }
-    }catch(error){
+    } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   }
 
-  const handleSignOut = async()=>{
-    try{
+  const handleSignOut = async () => {
+    try {
       dispatch(signOutUserStart());
       const res = await fetch('/api/signout');
 
       const data = await res.json();
 
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(signOutUserFailure(data.message));
       }
-      else{
+      else {
         dispatch(signOutUserSuccess());
       }
-    }catch(error){
+    } catch (error) {
       dispatch(signOutUserFailure(error.message));
     }
   }
 
-  const handleShowListing = async () =>{
-    try{
+  const handleShowListing = async () => {
+    try {
       setShowListingsError(false);
-      const res=await fetch(`/api/listing/${currentUser._id}`);
-      
-      const data=await res.json();
+      const res = await fetch(`/api/listing/${currentUser._id}`);
 
-      if(data.success === false){
+      const data = await res.json();
+
+      if (data.success === false) {
         setShowListingsError(true);
         return;
       }
-      else{
-        
+      else {
+
         setUserListings(data);
         //console.log(data);
         console.log(UserListings);
       }
-    }catch(error){
+    } catch (error) {
       setShowListingsError('Error is getting user listing');
     }
+  }
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      const res = await fetch(`/api/deletelisting/${listingId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+   
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+      setUserListings((prev) => prev.filter((listing) => listing._id !== listingId));
+
+    } catch (error) {
+      console.log(error.message);
+    }
+
   }
   return (
     <div>
@@ -158,7 +178,7 @@ const Profile = () => {
             <h2 className="text-uppercase text-center mb-5">profile</h2>
             <Form style={{ width: '100%' }}>
               <div className="text-center mb-4">
-              <input onChange={(e) => {
+                <input onChange={(e) => {
                   setFile(e.target.files[0])
                 }} type='file' ref={fileRef} hidden accept='image/*' />
                 <img
@@ -185,13 +205,13 @@ const Profile = () => {
                 </p>
               </div>
               <Form.Group className='mb-4'>
-                <Form.Control type='text' placeholder='Your Name' size='lg' name='name' value={info.name}  onChange={handleChange}/>
+                <Form.Control type='text' placeholder='Your Name' size='lg' name='name' value={info.name} onChange={handleChange} />
               </Form.Group>
               <Form.Group className='mb-4'>
-                <Form.Control type='email' placeholder='Your Email' size='lg' name='email'  value={info.email}  onChange={handleChange}/>
+                <Form.Control type='email' placeholder='Your Email' size='lg' name='email' value={info.email} onChange={handleChange} />
               </Form.Group>
               <Form.Group className='mb-4'>
-                <Form.Control type='password' placeholder='Password' size='lg' name='password' value={info.password} onChange={handleChange}/>
+                <Form.Control type='password' placeholder='Password' size='lg' name='password' value={info.password} onChange={handleChange} />
               </Form.Group>
               <Button
                 className='mb-4 w-100'
@@ -203,7 +223,7 @@ const Profile = () => {
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? 'LOADING...': 'UPDATE'}
+                {loading ? 'LOADING...' : 'UPDATE'}
               </Button>
               <Link to="/create-listing" style={{ textDecoration: 'none' }}>
                 <button
@@ -228,105 +248,102 @@ const Profile = () => {
             </Form>
 
             <div className="w-100 d-flex justify-content-center">
-                <Link onClick={handleShowListing} style={{ color: 'green', textDecoration: 'None' }}>Show Listings</Link>
-              </div>
+              <Link onClick={handleShowListing} style={{ color: 'green', textDecoration: 'None' }}>Show Listings</Link>
+            </div>
           </Card.Body>
-          {UserListings && UserListings.length > 0 && 
+          {UserListings && UserListings.length > 0 &&
   UserListings.map((listing) => (
     <div key={listing._id} style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', marginBottom: '10px' }}>
-      <Link to={`/listing/${listing._id}`} style={{ textDecoration: 'none' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Link to={`/listing/${listing._id}`} style={{ textDecoration: 'none' }}>
           <img
             src={listing.imageUrls[0]}
             alt='listing image'
             style={{ width: '100px', height: '100px', marginRight: '10px' }}
           />
-          <p style={{ color: 'black', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: '600', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{listing.name}</p>
-          <div >
-  <button 
-    className="btn btn-danger btn-sm"
-    style={{ padding: '5px', display: 'block', marginBottom: '5px', width: '70px', height: '30px' }} // Added width and height
-  >
-    DELETE
-  </button>
-  <button
-    className="btn btn-success btn-sm"
-    style={{ padding: '5px', display: 'block', width: '70px', height: '30px' }} // Added width and height
-  >
-    EDIT
-  </button>
-</div>
-
-          
-          
+        </Link>
+        <Link to={`/listing/${listing._id}`} style={{ textDecoration: 'none', flex: 1, overflow: 'hidden' }}>
+          <p style={{ color: 'black', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>{listing.name}</p>
+        </Link>
+        <div>
+          <button
+            className="btn btn-danger btn-sm"
+            style={{ padding: '5px', display: 'block', marginBottom: '5px', width: '70px', height: '30px' }}
+            onClick={() => handleDeleteListing(listing._id)}
+          >
+            DELETE
+          </button>
+          <button
+            className="btn btn-success btn-sm"
+            style={{ padding: '5px', display: 'block', width: '70px', height: '30px' }}
+          >
+            EDIT
+          </button>
         </div>
-      </Link>
+      </div>
     </div>
   ))
 }
 
+
         </Card>
-        
       </Container>
-
-      
-
-    {error && (
-      <p
-        className='text-red-500'
-        style={{
-          position: 'fixed',
-                  bottom: '0',
-                  left: '0',
-                  width: '100%',
-                  textAlign: 'center',
-                  backgroundColor: '#f8d7da',
-                  padding: '10px',
-                  color: 'red',
-                  margin: '0',
-                  zIndex: 1000,
-        }}
-      >
-        {error}
-      </p>
-    )}
-    {showListingsError && (
-      <p
-        className='text-red-500'
-        style={{
-          position: 'fixed',
-                  bottom: '0',
-                  left: '0',
-                  width: '100%',
-                  textAlign: 'center',
-                  backgroundColor: '#f8d7da',
-                  padding: '10px',
-                  color: 'red',
-                  margin: '0',
-                  zIndex: 1001,
-        }}
-      >
-        {showListingsError}
-      </p>
-    )}
-{updateSuccess && (
-      <p
-        className='text-green-500'
-        style={{
-          position: 'fixed',
-                  bottom: '0',
-                  left: '0',
-                  width: '100%',
-                  textAlign: 'center',
-                  backgroundColor: '#8FDB81',
-                  padding: '10px',
-                  color: 'white',
-                  margin: '0',
-        }}
-      >
-        User Updated Successfully!!!
-      </p>
-    )}
+      {error && (
+        <p
+          className='text-red-500'
+          style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            textAlign: 'center',
+            backgroundColor: '#f8d7da',
+            padding: '10px',
+            color: 'red',
+            margin: '0',
+            zIndex: 1000,
+          }}
+        >
+          {error}
+        </p>
+      )}
+      {showListingsError && (
+        <p
+          className='text-red-500'
+          style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            textAlign: 'center',
+            backgroundColor: '#f8d7da',
+            padding: '10px',
+            color: 'red',
+            margin: '0',
+            zIndex: 1001,
+          }}
+        >
+          {showListingsError}
+        </p>
+      )}
+      {updateSuccess && (
+        <p
+          className='text-green-500'
+          style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            textAlign: 'center',
+            backgroundColor: '#8FDB81',
+            padding: '10px',
+            color: 'white',
+            margin: '0',
+          }}
+        >
+          User Updated Successfully!!!
+        </p>
+      )}
     </div>
   )
 }
