@@ -273,12 +273,15 @@ const Profile = () => {
           >
             DELETE
           </button>
-          <button
-            className="btn btn-success btn-sm"
-            style={{ padding: '5px', display: 'block', width: '70px', height: '30px' }}
-          >
-            EDIT
-          </button>
+          <Link to={`/update-listing/${listing._id}`}>
+            <button
+              className="btn btn-success btn-sm"
+              style={{ padding: '5px', display: 'block', width: '70px', height: '30px' }}
+            >
+              EDIT
+            </button>
+          </Link>
+          
         </div>
       </div>
     </div>
