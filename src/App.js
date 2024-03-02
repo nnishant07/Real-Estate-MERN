@@ -12,6 +12,7 @@ import Signup from './Pages/Signup';
 import PrivateRoute from './Components/PrivateRoute';
 import CreateListing from './Pages/CreateListing';
 import UpdateListing from './Pages/UpdateListing';
+import Listing from './Pages/Listing';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
               <Route path='/create-listing' element={<CreateListing/>}/>
               <Route path='/update-listing/:listingId' element={<UpdateListing/>}/>
             </Route>
+            <Route path='/listing/:listingId' element={<Listing/>}/>
             
           </Routes>
         </div>
