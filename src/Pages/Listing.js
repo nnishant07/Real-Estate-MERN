@@ -9,11 +9,12 @@ import {
   FaBath,
   FaBed,
   FaChair,
-  FaMapMarkedAlt,
   FaMapMarkerAlt,
   FaParking,
   FaShare,
 } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import Contact from '../Components/Contact';
 
 const Listing = () => {
   SwiperCore.use(Navigation);
@@ -21,6 +22,9 @@ const Listing = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const {currentUser} = useSelector((state)=>state.user);
+  const [contact,setContact]=useState(false);
+  
   const params = useParams();
   useEffect(() => {
     const fetchListing = async () => {
@@ -64,7 +68,7 @@ const Listing = () => {
           </Swiper>
 
           <div style={{ position: 'absolute', top: '13%', right: '3%', zIndex: '10' }}>
-            <div className="border rounded-full w-12 h-12 d-flex justify-content-center align-items-center bg-secondary cursor-pointer">
+            <div className="border rounded-full w-24 h-24 d-flex justify-content-center align-items-center bg-secondary cursor-pointer" style={{height:'30px',width:'30px'}}>
               <FaShare
                 className='text-primary'
                 onClick={() => {
@@ -132,6 +136,14 @@ const Listing = () => {
                 {listing.furnished ? 'Furnished' : 'Unfurnished'}
               </li>
             </ul>
+            {currentUser && listing.userRef !== currentUser._id && !contact && (
+
+              <button onClick={()=>setContact(true)}style={{textTransform: 'uppercase',padding: '10px',borderRadius: '5px',backgroundColor: '#444',color:'white',width:'100%',marginBottom: '15px'}}>
+              Contact Landlord
+              </button>
+            )}
+            {contact && <Contact listing={listing}/>}
+            
           </div>
         </div>
       )}
