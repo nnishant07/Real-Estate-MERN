@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React,{useEffect, useState} from 'react';
+import { Link,useNavigate } from 'react-router-dom';
 import { Container, Form, Nav, Navbar, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
@@ -44,7 +44,26 @@ function Header() {
   };
 
   const { currentUser } = useSelector((state) => state.user);
+  const [searchTerm,setSearchTerm] = useState('');
 
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('searchTerm', searchTerm);
+    const searchQuery = urlParams.toString();
+    navigate(`/search?${searchQuery}`);
+  };
+
+  useEffect(()=>{
+    const urlParams =  new URLSearchParams(window.location.search);
+    const searchTermFromUrl = urlParams.get('searchTerm');
+
+    if(searchTermFromUrl){
+      setSearchTerm(searchTermFromUrl);
+    }
+  },[window.location.search]);
   return (
     <Navbar expand="lg" style={headerNavbarStyle}>
       <Container fluid className="d-flex justify-content-between align-items-center">
@@ -53,8 +72,10 @@ function Header() {
           <span style={{ color: 'rgb(51, 65, 85)' }}>Estate</span>
         </Navbar.Brand>
         <div className="flex justify-between flex-grow-1" style={searchContainerStyle}>
-          <Form className="d-flex align-items-center">
-            <Form.Control type="search" placeholder="Search" className="me-2 rounded-pill" aria-label="Search" />
+          <Form className="d-flex align-items-center" onSubmit={handleSubmit}>
+            <Form.Control type="search" placeholder="Search" className="me-2 rounded-pill" aria-label="Search" value={searchTerm} 
+              onChange={(e)=> setSearchTerm(e.target.value)}
+            />
             <Button
               variant="outline-secondary"
               className="bg-white border rounded-pill"
