@@ -49,7 +49,7 @@ const ListingItem = ({ listing }) => {
           }
           alt='listing cover'
           className='w-full object-cover img-fluid'
-          style={{ height: '320px', minWidth: '400px' }} // Adjust height as needed
+          style={{ height: '320px', minWidth: '200px' }} // Adjust height as needed
         />
         <Card.Body className='p-3'>
           <Card.Title className='text-lg font-semibold text-truncate' style={{ ...textStyle, maxWidth: '100%' }}>
