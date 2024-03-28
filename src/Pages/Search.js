@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row,Col, Container, Card, Form, FormGroup, FormLabel, FormControl, Button } from 'react-bootstrap';
 import Header from '../Components/Header';
 import { useNavigate } from 'react-router-dom';
+import ListingItem from '../Components/ListingItem';
 
 
 const Search = () => {
@@ -165,12 +166,26 @@ const Search = () => {
             </Card>
         </Container>
         </Col>
-        <Col md={6} lg={6}>
-            
-          <Container fluid className='d-flex align-items-center justify-content-center'>
-          <h2 className='m-4' style={{ fontWeight: '600' }}>Listing results:</h2>
-          </Container>
-        </Col>
+        <Col md={6} lg={6} className='flex-1'>
+      <Container className="mb-4">
+        <h2 className='m-4' style={{ fontWeight: '600' }}>Listing results:</h2>
+        <div className='d-flex flex-wrap gap-4' style={{ paddingTop: '1.5rem', paddingRight: '1.5rem', paddingLeft: '1.5rem' }}>
+          {loading && (
+            <p className='text-xl text-slate-700'>Loading...</p>
+          )}
+
+          {!loading && listings.length === 0 && (
+            <p className='text-xl text-slate-700'>No listing found!</p>
+          )}
+
+          {!loading &&
+            listings &&
+            listings.map((listing) => (
+              <ListingItem key={listing._id} listing={listing} />
+            ))}
+        </div>
+      </Container>
+    </Col>
       </Row>
     </Container>
     
