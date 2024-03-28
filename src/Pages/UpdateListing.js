@@ -104,7 +104,7 @@ const UpdateListing = () => {
   }
 
   const handleChange = (e) =>{
-    if(e.target.id === 'sell' || e.target.id === 'rent'){
+    if(e.target.id === 'sale' || e.target.id === 'rent'){
       setFormData({
         ...formData,
         type: e.target.id
@@ -190,12 +190,12 @@ const UpdateListing = () => {
                       <div key={`inline-${type}`} className="mb-4">
                         <Form.Check
                           inline
-                          label="Sell"
-                          id='sell'
+                          label="Sale"
+                          id='sale'
                           type={type}
                           style={{ fontSize: '20px' }}
                           onChange={handleChange} 
-                          checked={formData.type==='sell'}
+                          checked={formData.type==='sale'}
                         />
                         <Form.Check
                           inline
